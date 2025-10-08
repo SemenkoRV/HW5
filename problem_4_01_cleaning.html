@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -3063,10 +3097,9 @@ vertical-align: -.125em;
   <li><a href="#step-2-loading-in-the-data" id="toc-step-2-loading-in-the-data" class="nav-link" data-scroll-target="#step-2-loading-in-the-data"><span class="header-section-number">4</span> Step 2: Loading in the data</a></li>
   <li><a href="#step-3-examine-the-data-and-create-action-items" id="toc-step-3-examine-the-data-and-create-action-items" class="nav-link" data-scroll-target="#step-3-examine-the-data-and-create-action-items"><span class="header-section-number">5</span> Step 3: Examine the data and create action items</a>
   <ul class="collapse">
-  <li><a href="#finding-invalid-values" id="toc-finding-invalid-values" class="nav-link" data-scroll-target="#finding-invalid-values"><span class="header-section-number">5.1</span> Finding invalid values</a></li>
-  <li><a href="#assessing-column-names" id="toc-assessing-column-names" class="nav-link" data-scroll-target="#assessing-column-names"><span class="header-section-number">5.2</span> Assessing Column names</a></li>
-  <li><a href="#assessing-variable-type" id="toc-assessing-variable-type" class="nav-link" data-scroll-target="#assessing-variable-type"><span class="header-section-number">5.3</span> Assessing variable type</a></li>
-  <li><a href="#assessing-data-completeness" id="toc-assessing-data-completeness" class="nav-link" data-scroll-target="#assessing-data-completeness"><span class="header-section-number">5.4</span> Assessing data completeness</a></li>
+  <li><a href="#assessing-column-names" id="toc-assessing-column-names" class="nav-link" data-scroll-target="#assessing-column-names"><span class="header-section-number">5.1</span> Assessing Column names</a></li>
+  <li><a href="#assessing-variable-type" id="toc-assessing-variable-type" class="nav-link" data-scroll-target="#assessing-variable-type"><span class="header-section-number">5.2</span> Assessing variable type</a></li>
+  <li><a href="#assessing-data-completeness" id="toc-assessing-data-completeness" class="nav-link" data-scroll-target="#assessing-data-completeness"><span class="header-section-number">5.3</span> Assessing data completeness</a></li>
   </ul></li>
   <li><a href="#step-4-clean-and-pre-process-the-data" id="toc-step-4-clean-and-pre-process-the-data" class="nav-link" data-scroll-target="#step-4-clean-and-pre-process-the-data"><span class="header-section-number">6</span> Step 4: Clean and pre-process the data</a></li>
   </ul>
@@ -3096,9 +3129,12 @@ vertical-align: -.125em;
 
 <section id="domain-problem-formulation" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="domain-problem-formulation"><span class="header-section-number">1</span> Domain problem formulation</h2>
+<p>The goal is to try and reproduce the findings of Reinhart and Rogoff’s study (introduced in Chapter 3) using historical public debt data as well as gross domestic product (GDP) growth data.</p>
 </section>
 <section id="data-source-overview" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="data-source-overview"><span class="header-section-number">2</span> Data source overview</h2>
+<p>historical public debt data (debt.xls) from the International Monetary Fund (IMF),<br>
+Gross domestic product (GDP) growth data (growth.csv).</p>
 </section>
 <section id="sec-bg-info" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="sec-bg-info"><span class="header-section-number">3</span> Step 1: Review background information</h2>
@@ -3108,24 +3144,1913 @@ vertical-align: -.125em;
 </section>
 <section id="step-2-loading-in-the-data" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="step-2-loading-in-the-data"><span class="header-section-number">4</span> Step 2: Loading in the data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages(&quot;readxl&quot;)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#library(readxl)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   4.0.0     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Data first was fixed in Google sheets, and now I am loading corrected data</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>growth_original <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&#39;/Users/romansemenko/Documents/FALL 2025/Practical data analysis/HW5/growth_original.csv&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 266 Columns: 66
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr  (4): Country Name, Country Code, Indicator Name, Indicator Code
+dbl (61): 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, ...
+lgl  (1): 1960
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(growth_original)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 1%">
+<col style="width: 3%">
+<col style="width: 2%">
+<col style="width: 0%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+<col style="width: 1%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Country Name</th>
+<th style="text-align: left;">Country Code</th>
+<th style="text-align: left;">Indicator Name</th>
+<th style="text-align: left;">Indicator Code</th>
+<th style="text-align: left;">1960</th>
+<th style="text-align: right;">1961</th>
+<th style="text-align: right;">1962</th>
+<th style="text-align: right;">1963</th>
+<th style="text-align: right;">1964</th>
+<th style="text-align: right;">1965</th>
+<th style="text-align: right;">1966</th>
+<th style="text-align: right;">1967</th>
+<th style="text-align: right;">1968</th>
+<th style="text-align: right;">1969</th>
+<th style="text-align: right;">1970</th>
+<th style="text-align: right;">1971</th>
+<th style="text-align: right;">1972</th>
+<th style="text-align: right;">1973</th>
+<th style="text-align: right;">1974</th>
+<th style="text-align: right;">1975</th>
+<th style="text-align: right;">1976</th>
+<th style="text-align: right;">1977</th>
+<th style="text-align: right;">1978</th>
+<th style="text-align: right;">1979</th>
+<th style="text-align: right;">1980</th>
+<th style="text-align: right;">1981</th>
+<th style="text-align: right;">1982</th>
+<th style="text-align: right;">1983</th>
+<th style="text-align: right;">1984</th>
+<th style="text-align: right;">1985</th>
+<th style="text-align: right;">1986</th>
+<th style="text-align: right;">1987</th>
+<th style="text-align: right;">1988</th>
+<th style="text-align: right;">1989</th>
+<th style="text-align: right;">1990</th>
+<th style="text-align: right;">1991</th>
+<th style="text-align: right;">1992</th>
+<th style="text-align: right;">1993</th>
+<th style="text-align: right;">1994</th>
+<th style="text-align: right;">1995</th>
+<th style="text-align: right;">1996</th>
+<th style="text-align: right;">1997</th>
+<th style="text-align: right;">1998</th>
+<th style="text-align: right;">1999</th>
+<th style="text-align: right;">2000</th>
+<th style="text-align: right;">2001</th>
+<th style="text-align: right;">2002</th>
+<th style="text-align: right;">2003</th>
+<th style="text-align: right;">2004</th>
+<th style="text-align: right;">2005</th>
+<th style="text-align: right;">2006</th>
+<th style="text-align: right;">2007</th>
+<th style="text-align: right;">2008</th>
+<th style="text-align: right;">2009</th>
+<th style="text-align: right;">2010</th>
+<th style="text-align: right;">2011</th>
+<th style="text-align: right;">2012</th>
+<th style="text-align: right;">2013</th>
+<th style="text-align: right;">2014</th>
+<th style="text-align: right;">2015</th>
+<th style="text-align: right;">2016</th>
+<th style="text-align: right;">2017</th>
+<th style="text-align: right;">2018</th>
+<th style="text-align: right;">2019</th>
+<th style="text-align: right;">2020</th>
+<th style="text-align: right;">2021</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Aruba</td>
+<td style="text-align: left;">ABW</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">16.0784314</td>
+<td style="text-align: right;">18.648649</td>
+<td style="text-align: right;">12.1298406</td>
+<td style="text-align: right;">3.9614017</td>
+<td style="text-align: right;">7.9628725</td>
+<td style="text-align: right;">5.882353</td>
+<td style="text-align: right;">7.3076923</td>
+<td style="text-align: right;">8.2039028</td>
+<td style="text-align: right;">2.547144</td>
+<td style="text-align: right;">1.185788</td>
+<td style="text-align: right;">7.046874</td>
+<td style="text-align: right;">1.991986</td>
+<td style="text-align: right;">1.238042</td>
+<td style="text-align: right;">7.616588</td>
+<td style="text-align: right;">4.195963</td>
+<td style="text-align: right;">-0.957771</td>
+<td style="text-align: right;">1.120879</td>
+<td style="text-align: right;">7.281026</td>
+<td style="text-align: right;">-0.3849271</td>
+<td style="text-align: right;">1.138906</td>
+<td style="text-align: right;">3.096722</td>
+<td style="text-align: right;">1.833431</td>
+<td style="text-align: right;">-11.683585</td>
+<td style="text-align: right;">-2.732596</td>
+<td style="text-align: right;">3.3667781</td>
+<td style="text-align: right;">-1.0353753</td>
+<td style="text-align: right;">6.429817</td>
+<td style="text-align: right;">-0.0204792</td>
+<td style="text-align: right;">3.543630</td>
+<td style="text-align: right;">2.1167161</td>
+<td style="text-align: right;">5.482371</td>
+<td style="text-align: right;">1.267218</td>
+<td style="text-align: right;">-2.085600</td>
+<td style="text-align: right;">-22.318948</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Africa Eastern and Southern</td>
+<td style="text-align: left;">AFE</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">0.2395938</td>
+<td style="text-align: right;">7.980768</td>
+<td style="text-align: right;">5.164334</td>
+<td style="text-align: right;">4.579952</td>
+<td style="text-align: right;">5.327717</td>
+<td style="text-align: right;">3.912108</td>
+<td style="text-align: right;">5.256810</td>
+<td style="text-align: right;">4.023776</td>
+<td style="text-align: right;">5.279927</td>
+<td style="text-align: right;">4.700767</td>
+<td style="text-align: right;">5.371653</td>
+<td style="text-align: right;">2.150365</td>
+<td style="text-align: right;">4.437242</td>
+<td style="text-align: right;">5.88869</td>
+<td style="text-align: right;">1.730079</td>
+<td style="text-align: right;">2.846272</td>
+<td style="text-align: right;">1.230744</td>
+<td style="text-align: right;">1.033546</td>
+<td style="text-align: right;">2.795725</td>
+<td style="text-align: right;">5.419382</td>
+<td style="text-align: right;">4.330753</td>
+<td style="text-align: right;">0.5084853</td>
+<td style="text-align: right;">0.1523531</td>
+<td style="text-align: right;">3.005832</td>
+<td style="text-align: right;">-0.4476893</td>
+<td style="text-align: right;">2.286226</td>
+<td style="text-align: right;">4.2324506</td>
+<td style="text-align: right;">3.997774</td>
+<td style="text-align: right;">2.8976382</td>
+<td style="text-align: right;">-0.0396773</td>
+<td style="text-align: right;">0.1053010</td>
+<td style="text-align: right;">-1.979118</td>
+<td style="text-align: right;">-0.3923001</td>
+<td style="text-align: right;">2.0258568</td>
+<td style="text-align: right;">4.290761</td>
+<td style="text-align: right;">5.436661</td>
+<td style="text-align: right;">4.424004</td>
+<td style="text-align: right;">1.848162</td>
+<td style="text-align: right;">2.636486</td>
+<td style="text-align: right;">3.350773</td>
+<td style="text-align: right;">3.658701</td>
+<td style="text-align: right;">3.893379</td>
+<td style="text-align: right;">3.080376</td>
+<td style="text-align: right;">5.508355</td>
+<td style="text-align: right;">6.1168012</td>
+<td style="text-align: right;">6.554881</td>
+<td style="text-align: right;">6.604282</td>
+<td style="text-align: right;">4.343457</td>
+<td style="text-align: right;">0.761219</td>
+<td style="text-align: right;">5.152125</td>
+<td style="text-align: right;">3.6808705</td>
+<td style="text-align: right;">0.9230672</td>
+<td style="text-align: right;">4.200209</td>
+<td style="text-align: right;">3.9843869</td>
+<td style="text-align: right;">2.952845</td>
+<td style="text-align: right;">2.2170165</td>
+<td style="text-align: right;">2.557135</td>
+<td style="text-align: right;">2.485244</td>
+<td style="text-align: right;">2.025941</td>
+<td style="text-align: right;">-2.886856</td>
+<td style="text-align: right;">4.303667</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Afghanistan</td>
+<td style="text-align: left;">AFG</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">8.832278</td>
+<td style="text-align: right;">1.414118</td>
+<td style="text-align: right;">11.2297148</td>
+<td style="text-align: right;">5.357403</td>
+<td style="text-align: right;">13.826320</td>
+<td style="text-align: right;">3.924984</td>
+<td style="text-align: right;">21.390528</td>
+<td style="text-align: right;">14.362441</td>
+<td style="text-align: right;">0.4263548</td>
+<td style="text-align: right;">12.7522871</td>
+<td style="text-align: right;">5.600745</td>
+<td style="text-align: right;">2.7245434</td>
+<td style="text-align: right;">1.451315</td>
+<td style="text-align: right;">2.2603142</td>
+<td style="text-align: right;">2.647003</td>
+<td style="text-align: right;">1.189228</td>
+<td style="text-align: right;">3.911603</td>
+<td style="text-align: right;">-2.351101</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Africa Western and Central</td>
+<td style="text-align: left;">AFW</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">1.8487517</td>
+<td style="text-align: right;">3.770220</td>
+<td style="text-align: right;">7.272440</td>
+<td style="text-align: right;">5.396349</td>
+<td style="text-align: right;">4.049793</td>
+<td style="text-align: right;">-1.787079</td>
+<td style="text-align: right;">-9.546464</td>
+<td style="text-align: right;">1.465775</td>
+<td style="text-align: right;">15.491888</td>
+<td style="text-align: right;">17.908938</td>
+<td style="text-align: right;">10.807494</td>
+<td style="text-align: right;">3.145983</td>
+<td style="text-align: right;">4.213414</td>
+<td style="text-align: right;">10.24984</td>
+<td style="text-align: right;">-2.164265</td>
+<td style="text-align: right;">8.578674</td>
+<td style="text-align: right;">4.726128</td>
+<td style="text-align: right;">-2.194177</td>
+<td style="text-align: right;">5.230813</td>
+<td style="text-align: right;">1.995421</td>
+<td style="text-align: right;">-6.932610</td>
+<td style="text-align: right;">-3.3502802</td>
+<td style="text-align: right;">-6.5340825</td>
+<td style="text-align: right;">0.559429</td>
+<td style="text-align: right;">5.5516104</td>
+<td style="text-align: right;">1.414670</td>
+<td style="text-align: right;">1.4483746</td>
+<td style="text-align: right;">4.844253</td>
+<td style="text-align: right;">2.2721156</td>
+<td style="text-align: right;">6.5628696</td>
+<td style="text-align: right;">1.1210805</td>
+<td style="text-align: right;">2.693959</td>
+<td style="text-align: right;">-1.1604666</td>
+<td style="text-align: right;">-0.2996876</td>
+<td style="text-align: right;">1.927045</td>
+<td style="text-align: right;">4.629045</td>
+<td style="text-align: right;">4.234657</td>
+<td style="text-align: right;">3.506518</td>
+<td style="text-align: right;">1.421003</td>
+<td style="text-align: right;">3.734666</td>
+<td style="text-align: right;">5.212684</td>
+<td style="text-align: right;">9.899548</td>
+<td style="text-align: right;">5.518474</td>
+<td style="text-align: right;">8.013453</td>
+<td style="text-align: right;">5.8483641</td>
+<td style="text-align: right;">5.374481</td>
+<td style="text-align: right;">5.530899</td>
+<td style="text-align: right;">6.279223</td>
+<td style="text-align: right;">6.274498</td>
+<td style="text-align: right;">6.957030</td>
+<td style="text-align: right;">4.8483326</td>
+<td style="text-align: right;">5.1429969</td>
+<td style="text-align: right;">6.104192</td>
+<td style="text-align: right;">5.9273551</td>
+<td style="text-align: right;">2.745894</td>
+<td style="text-align: right;">0.1278444</td>
+<td style="text-align: right;">2.317679</td>
+<td style="text-align: right;">2.952190</td>
+<td style="text-align: right;">3.202544</td>
+<td style="text-align: right;">-0.897014</td>
+<td style="text-align: right;">3.914799</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Angola</td>
+<td style="text-align: left;">AGO</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">-4.400001</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">4.2000014</td>
+<td style="text-align: right;">6.000002</td>
+<td style="text-align: right;">3.4999995</td>
+<td style="text-align: right;">2.900002</td>
+<td style="text-align: right;">4.0827486</td>
+<td style="text-align: right;">6.128890</td>
+<td style="text-align: right;">0.0416215</td>
+<td style="text-align: right;">-3.4500987</td>
+<td style="text-align: right;">0.9913593</td>
+<td style="text-align: right;">-5.838281</td>
+<td style="text-align: right;">-23.9834174</td>
+<td style="text-align: right;">1.3393634</td>
+<td style="text-align: right;">15.000000</td>
+<td style="text-align: right;">13.544370</td>
+<td style="text-align: right;">7.274277</td>
+<td style="text-align: right;">4.691147</td>
+<td style="text-align: right;">2.181490</td>
+<td style="text-align: right;">3.054624</td>
+<td style="text-align: right;">4.205999</td>
+<td style="text-align: right;">13.665689</td>
+<td style="text-align: right;">2.990000</td>
+<td style="text-align: right;">10.950000</td>
+<td style="text-align: right;">15.0300000</td>
+<td style="text-align: right;">11.550000</td>
+<td style="text-align: right;">14.010000</td>
+<td style="text-align: right;">11.170000</td>
+<td style="text-align: right;">0.860000</td>
+<td style="text-align: right;">4.860000</td>
+<td style="text-align: right;">3.4700000</td>
+<td style="text-align: right;">8.5400000</td>
+<td style="text-align: right;">4.950000</td>
+<td style="text-align: right;">4.8200000</td>
+<td style="text-align: right;">0.940000</td>
+<td style="text-align: right;">-2.5800000</td>
+<td style="text-align: right;">-0.150000</td>
+<td style="text-align: right;">-1.316312</td>
+<td style="text-align: right;">-0.700000</td>
+<td style="text-align: right;">-5.500000</td>
+<td style="text-align: right;">0.700000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Albania</td>
+<td style="text-align: left;">ALB</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">5.745635</td>
+<td style="text-align: right;">2.9485968</td>
+<td style="text-align: right;">1.1049383</td>
+<td style="text-align: right;">-1.251597</td>
+<td style="text-align: right;">1.7806440</td>
+<td style="text-align: right;">5.637243</td>
+<td style="text-align: right;">-0.7878427</td>
+<td style="text-align: right;">-1.420040</td>
+<td style="text-align: right;">9.8365490</td>
+<td style="text-align: right;">-9.5756402</td>
+<td style="text-align: right;">-28.0021417</td>
+<td style="text-align: right;">-7.187111</td>
+<td style="text-align: right;">9.5594117</td>
+<td style="text-align: right;">8.3028666</td>
+<td style="text-align: right;">13.322333</td>
+<td style="text-align: right;">9.099999</td>
+<td style="text-align: right;">-10.919984</td>
+<td style="text-align: right;">8.829424</td>
+<td style="text-align: right;">12.890804</td>
+<td style="text-align: right;">6.946217</td>
+<td style="text-align: right;">8.293313</td>
+<td style="text-align: right;">4.536524</td>
+<td style="text-align: right;">5.528638</td>
+<td style="text-align: right;">5.514668</td>
+<td style="text-align: right;">5.5264242</td>
+<td style="text-align: right;">5.902659</td>
+<td style="text-align: right;">5.983259</td>
+<td style="text-align: right;">7.500041</td>
+<td style="text-align: right;">3.354289</td>
+<td style="text-align: right;">3.706938</td>
+<td style="text-align: right;">2.5454061</td>
+<td style="text-align: right;">1.4172428</td>
+<td style="text-align: right;">1.002018</td>
+<td style="text-align: right;">1.7744489</td>
+<td style="text-align: right;">2.218726</td>
+<td style="text-align: right;">3.3149807</td>
+<td style="text-align: right;">3.802227</td>
+<td style="text-align: right;">4.019360</td>
+<td style="text-align: right;">2.088063</td>
+<td style="text-align: right;">-3.481630</td>
+<td style="text-align: right;">8.544083</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>debt_original <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&#39;/Users/romansemenko/Documents/FALL 2025/Practical data analysis/HW5/debt_original.csv&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 194 Columns: 217
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (217): DEBT (% of GDP), 1800, 1801, 1802, 1803, 1804, 1805, 1806, 1807, ...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
 </section>
 <section id="step-3-examine-the-data-and-create-action-items" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="step-3-examine-the-data-and-create-action-items"><span class="header-section-number">5</span> Step 3: Examine the data and create action items</h2>
-<section id="finding-invalid-values" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="finding-invalid-values"><span class="header-section-number">5.1</span> Finding invalid values</h3>
+<p>“No data” values should be “NA” Data should be converted to long format ###Debt: remove data for “debt” before 1960 first columns should be renamed to “country” convert debt % rate, year from char to numeric ###Growth remove non-existing countries renaming countries that have different name in the debt table convert growth % rate, year char to numeric ### Finding invalid values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Debt</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;prepare_debt_data.R&#39;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>debt_clean <span class="ot">&lt;-</span> <span class="fu">prepare_debt_data</span>(debt_original)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Growth </span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;prepare_growth_data.R&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>growth_clean <span class="ot">&lt;-</span> <span class="fu">prepare_growth_data</span>(growth_original)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="assessing-column-names" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="assessing-column-names"><span class="header-section-number">5.1</span> Assessing Column names</h3>
+<p>Done above</p>
 </section>
-<section id="assessing-column-names" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="assessing-column-names"><span class="header-section-number">5.2</span> Assessing Column names</h3>
+<section id="assessing-variable-type" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="assessing-variable-type"><span class="header-section-number">5.2</span> Assessing variable type</h3>
+<p>done before</p>
 </section>
-<section id="assessing-variable-type" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="assessing-variable-type"><span class="header-section-number">5.3</span> Assessing variable type</h3>
-</section>
-<section id="assessing-data-completeness" class="level3" data-number="5.4">
-<h3 data-number="5.4" class="anchored" data-anchor-id="assessing-data-completeness"><span class="header-section-number">5.4</span> Assessing data completeness</h3>
+<section id="assessing-data-completeness" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="assessing-data-completeness"><span class="header-section-number">5.3</span> Assessing data completeness</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#For the DEBT data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(debt_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10864     3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#note it&#39;s 194 (countries) times 56 years </span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>debt_clean <span class="sc">|&gt;</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep only numeric variables</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># for each column, compute a data frame with the min, mean, and max.</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_df</span>(<span class="cf">function</span>(.col) { <span class="fu">data.frame</span>(<span class="at">min =</span> <span class="fu">min</span>(.col, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">mean =</span> <span class="fu">mean</span>(.col, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">max =</span> <span class="fu">max</span>(.col, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) },</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">.id =</span> <span class="st">&quot;variable&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">variable</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">year</td>
+<td style="text-align: right;">1960</td>
+<td style="text-align: right;">1987.50000</td>
+<td style="text-align: right;">2015.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">debt_as_percent_of_gdp</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">56.11386</td>
+<td style="text-align: right;">2092.92</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>debt_clean <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_n</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">year</th>
+<th style="text-align: right;">debt_as_percent_of_gdp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Denmark</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">42.88</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Belarus</td>
+<td style="text-align: right;">1983</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Guatemala</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">24.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">North Macedonia</td>
+<td style="text-align: right;">1966</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Greece</td>
+<td style="text-align: right;">1965</td>
+<td style="text-align: right;">16.51</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Indonesia</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">73.70</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gabon</td>
+<td style="text-align: right;">2009</td>
+<td style="text-align: right;">23.09</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Maldives</td>
+<td style="text-align: right;">1987</td>
+<td style="text-align: right;">68.07</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Uzbekistan</td>
+<td style="text-align: right;">1999</td>
+<td style="text-align: right;">29.35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Burundi</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: right;">36.56</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#For the GROWTH data</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(growth_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11532     6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>growth_clean <span class="sc">|&gt;</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep only numeric variables</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># for each column, compute a data frame with the min, mean, and max.</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_df</span>(<span class="cf">function</span>(.col) { <span class="fu">data.frame</span>(<span class="at">min =</span> <span class="fu">min</span>(.col, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">mean =</span> <span class="fu">mean</span>(.col, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">max =</span> <span class="fu">max</span>(.col, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) },</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">.id =</span> <span class="st">&quot;variable&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">variable</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">year</td>
+<td style="text-align: right;">1960.00000</td>
+<td style="text-align: right;">1990.500000</td>
+<td style="text-align: right;">2021.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">growth_as_percent</td>
+<td style="text-align: right;">-64.04711</td>
+<td style="text-align: right;">3.699121</td>
+<td style="text-align: right;">149.973</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>growth_clean <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_n</span>(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 24%">
+<col style="width: 20%">
+<col style="width: 5%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: left;">Country Code</th>
+<th style="text-align: left;">Indicator Name</th>
+<th style="text-align: left;">Indicator Code</th>
+<th style="text-align: right;">year</th>
+<th style="text-align: right;">growth_as_percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Ethiopia</td>
+<td style="text-align: left;">ETH</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1991</td>
+<td style="text-align: right;">-7.1374797</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Afghanistan</td>
+<td style="text-align: left;">AFG</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1963</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sweden</td>
+<td style="text-align: left;">SWE</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1975</td>
+<td style="text-align: right;">2.5528626</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cambodia</td>
+<td style="text-align: left;">KHM</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1968</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eritrea</td>
+<td style="text-align: left;">ERI</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Azerbaijan</td>
+<td style="text-align: left;">AZE</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1996</td>
+<td style="text-align: right;">1.2999994</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Chile</td>
+<td style="text-align: left;">CHL</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1996</td>
+<td style="text-align: right;">6.8029166</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Togo</td>
+<td style="text-align: left;">TGO</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">2004</td>
+<td style="text-align: right;">-0.9786653</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sierra Leone</td>
+<td style="text-align: left;">SLE</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1980</td>
+<td style="text-align: right;">4.8435038</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Greece</td>
+<td style="text-align: left;">GRC</td>
+<td style="text-align: left;">GDP growth (annual %)</td>
+<td style="text-align: left;">NY.GDP.MKTP.KD.ZG</td>
+<td style="text-align: right;">1993</td>
+<td style="text-align: right;">-1.6000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>###Comparing Australia as on gradescope</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>debt_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&#39;Australia&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">year</th>
+<th style="text-align: right;">debt_as_percent_of_gdp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1960</td>
+<td style="text-align: right;">31.47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1961</td>
+<td style="text-align: right;">30.31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1962</td>
+<td style="text-align: right;">30.42</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1963</td>
+<td style="text-align: right;">29.32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1964</td>
+<td style="text-align: right;">27.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1965</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1966</td>
+<td style="text-align: right;">41.23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1967</td>
+<td style="text-align: right;">39.25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1968</td>
+<td style="text-align: right;">38.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1969</td>
+<td style="text-align: right;">35.73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1970</td>
+<td style="text-align: right;">33.91</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1971</td>
+<td style="text-align: right;">31.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1972</td>
+<td style="text-align: right;">29.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1973</td>
+<td style="text-align: right;">26.47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1974</td>
+<td style="text-align: right;">23.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1975</td>
+<td style="text-align: right;">22.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1976</td>
+<td style="text-align: right;">22.30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1977</td>
+<td style="text-align: right;">21.49</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1978</td>
+<td style="text-align: right;">22.38</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1979</td>
+<td style="text-align: right;">22.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1980</td>
+<td style="text-align: right;">21.35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1981</td>
+<td style="text-align: right;">18.94</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1982</td>
+<td style="text-align: right;">17.39</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1983</td>
+<td style="text-align: right;">18.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1984</td>
+<td style="text-align: right;">20.36</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1985</td>
+<td style="text-align: right;">22.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1986</td>
+<td style="text-align: right;">23.41</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1987</td>
+<td style="text-align: right;">22.06</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1988</td>
+<td style="text-align: right;">24.82</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: right;">22.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1990</td>
+<td style="text-align: right;">21.58</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1991</td>
+<td style="text-align: right;">22.91</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1992</td>
+<td style="text-align: right;">27.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1993</td>
+<td style="text-align: right;">30.32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1994</td>
+<td style="text-align: right;">31.45</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1995</td>
+<td style="text-align: right;">30.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1996</td>
+<td style="text-align: right;">29.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: right;">25.79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1998</td>
+<td style="text-align: right;">23.70</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1999</td>
+<td style="text-align: right;">22.52</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: right;">19.46</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">17.04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2002</td>
+<td style="text-align: right;">14.95</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2003</td>
+<td style="text-align: right;">13.15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2004</td>
+<td style="text-align: right;">11.89</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2005</td>
+<td style="text-align: right;">10.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2006</td>
+<td style="text-align: right;">9.97</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">9.68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2008</td>
+<td style="text-align: right;">11.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2009</td>
+<td style="text-align: right;">16.75</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">20.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2011</td>
+<td style="text-align: right;">24.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2012</td>
+<td style="text-align: right;">27.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: right;">30.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">34.32</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">37.64</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>growth_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&#39;Australia&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country, year, growth_as_percent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">year</th>
+<th style="text-align: right;">growth_as_percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1960</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1961</td>
+<td style="text-align: right;">2.4832705</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1962</td>
+<td style="text-align: right;">1.2944682</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1963</td>
+<td style="text-align: right;">6.2149490</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1964</td>
+<td style="text-align: right;">6.9785404</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1965</td>
+<td style="text-align: right;">5.9808925</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1966</td>
+<td style="text-align: right;">2.3819661</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1967</td>
+<td style="text-align: right;">6.3036501</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1968</td>
+<td style="text-align: right;">5.0951032</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1969</td>
+<td style="text-align: right;">7.0435263</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1970</td>
+<td style="text-align: right;">7.1757816</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1971</td>
+<td style="text-align: right;">3.9996151</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1972</td>
+<td style="text-align: right;">3.9090555</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1973</td>
+<td style="text-align: right;">2.6191931</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1974</td>
+<td style="text-align: right;">4.1054594</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1975</td>
+<td style="text-align: right;">1.3356463</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1976</td>
+<td style="text-align: right;">2.5913267</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1977</td>
+<td style="text-align: right;">3.5928624</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1978</td>
+<td style="text-align: right;">0.8941041</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1979</td>
+<td style="text-align: right;">4.0507806</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1980</td>
+<td style="text-align: right;">3.0353993</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1981</td>
+<td style="text-align: right;">3.3388073</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1982</td>
+<td style="text-align: right;">3.3228679</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1983</td>
+<td style="text-align: right;">-2.2219694</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1984</td>
+<td style="text-align: right;">4.5959243</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1985</td>
+<td style="text-align: right;">5.2521152</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1986</td>
+<td style="text-align: right;">4.0309680</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1987</td>
+<td style="text-align: right;">2.5479320</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1988</td>
+<td style="text-align: right;">5.7436778</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: right;">3.8644404</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1990</td>
+<td style="text-align: right;">3.5735069</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1991</td>
+<td style="text-align: right;">-0.3950872</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1992</td>
+<td style="text-align: right;">0.4137804</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1993</td>
+<td style="text-align: right;">4.0335671</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1994</td>
+<td style="text-align: right;">3.9804737</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1995</td>
+<td style="text-align: right;">3.8338306</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1996</td>
+<td style="text-align: right;">3.8544200</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: right;">3.9082909</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1998</td>
+<td style="text-align: right;">4.6140116</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1999</td>
+<td style="text-align: right;">4.9366749</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: right;">3.9124277</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">2.0383007</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2002</td>
+<td style="text-align: right;">4.0145267</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2003</td>
+<td style="text-align: right;">3.1103251</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2004</td>
+<td style="text-align: right;">4.2054469</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2005</td>
+<td style="text-align: right;">3.1603383</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2006</td>
+<td style="text-align: right;">2.7268934</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">3.7684875</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2008</td>
+<td style="text-align: right;">3.5770149</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2009</td>
+<td style="text-align: right;">1.8668321</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">2.1723371</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2011</td>
+<td style="text-align: right;">2.4697463</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2012</td>
+<td style="text-align: right;">3.9173625</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: right;">2.6002119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">2.5629315</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">2.1722048</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">2.7416431</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">2.2959269</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">2.8709725</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2019</td>
+<td style="text-align: right;">2.1131494</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2020</td>
+<td style="text-align: right;">-0.0038366</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">1.4751629</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="step-4-clean-and-pre-process-the-data" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="step-4-clean-and-pre-process-the-data"><span class="header-section-number">6</span> Step 4: Clean and pre-process the data</h2>
+<p>done in steps before Now merging two tables</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;merge_two_tables.R&quot;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">merge_two_tables</span>(growth_clean,debt_clean)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Check the result for Australia</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>result <span class="sc">%&gt;%</span> <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&#39;Australia&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(country,year,growth_as_percent,debt_as_percent_of_gdp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">year</th>
+<th style="text-align: right;">growth_as_percent</th>
+<th style="text-align: right;">debt_as_percent_of_gdp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1960</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">31.47</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1961</td>
+<td style="text-align: right;">2.4832705</td>
+<td style="text-align: right;">30.31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1962</td>
+<td style="text-align: right;">1.2944682</td>
+<td style="text-align: right;">30.42</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1963</td>
+<td style="text-align: right;">6.2149490</td>
+<td style="text-align: right;">29.32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1964</td>
+<td style="text-align: right;">6.9785404</td>
+<td style="text-align: right;">27.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1965</td>
+<td style="text-align: right;">5.9808925</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1966</td>
+<td style="text-align: right;">2.3819661</td>
+<td style="text-align: right;">41.23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1967</td>
+<td style="text-align: right;">6.3036501</td>
+<td style="text-align: right;">39.25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1968</td>
+<td style="text-align: right;">5.0951032</td>
+<td style="text-align: right;">38.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1969</td>
+<td style="text-align: right;">7.0435263</td>
+<td style="text-align: right;">35.73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1970</td>
+<td style="text-align: right;">7.1757816</td>
+<td style="text-align: right;">33.91</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1971</td>
+<td style="text-align: right;">3.9996151</td>
+<td style="text-align: right;">31.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1972</td>
+<td style="text-align: right;">3.9090555</td>
+<td style="text-align: right;">29.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1973</td>
+<td style="text-align: right;">2.6191931</td>
+<td style="text-align: right;">26.47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1974</td>
+<td style="text-align: right;">4.1054594</td>
+<td style="text-align: right;">23.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1975</td>
+<td style="text-align: right;">1.3356463</td>
+<td style="text-align: right;">22.86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1976</td>
+<td style="text-align: right;">2.5913267</td>
+<td style="text-align: right;">22.30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1977</td>
+<td style="text-align: right;">3.5928624</td>
+<td style="text-align: right;">21.49</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1978</td>
+<td style="text-align: right;">0.8941041</td>
+<td style="text-align: right;">22.38</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1979</td>
+<td style="text-align: right;">4.0507806</td>
+<td style="text-align: right;">22.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1980</td>
+<td style="text-align: right;">3.0353993</td>
+<td style="text-align: right;">21.35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1981</td>
+<td style="text-align: right;">3.3388073</td>
+<td style="text-align: right;">18.94</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1982</td>
+<td style="text-align: right;">3.3228679</td>
+<td style="text-align: right;">17.39</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1983</td>
+<td style="text-align: right;">-2.2219694</td>
+<td style="text-align: right;">18.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1984</td>
+<td style="text-align: right;">4.5959243</td>
+<td style="text-align: right;">20.36</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1985</td>
+<td style="text-align: right;">5.2521152</td>
+<td style="text-align: right;">22.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1986</td>
+<td style="text-align: right;">4.0309680</td>
+<td style="text-align: right;">23.41</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1987</td>
+<td style="text-align: right;">2.5479320</td>
+<td style="text-align: right;">22.06</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1988</td>
+<td style="text-align: right;">5.7436778</td>
+<td style="text-align: right;">24.82</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1989</td>
+<td style="text-align: right;">3.8644404</td>
+<td style="text-align: right;">22.77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1990</td>
+<td style="text-align: right;">3.5735069</td>
+<td style="text-align: right;">21.58</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1991</td>
+<td style="text-align: right;">-0.3950872</td>
+<td style="text-align: right;">22.91</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1992</td>
+<td style="text-align: right;">0.4137804</td>
+<td style="text-align: right;">27.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1993</td>
+<td style="text-align: right;">4.0335671</td>
+<td style="text-align: right;">30.32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1994</td>
+<td style="text-align: right;">3.9804737</td>
+<td style="text-align: right;">31.45</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1995</td>
+<td style="text-align: right;">3.8338306</td>
+<td style="text-align: right;">30.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1996</td>
+<td style="text-align: right;">3.8544200</td>
+<td style="text-align: right;">29.11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: right;">3.9082909</td>
+<td style="text-align: right;">25.79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1998</td>
+<td style="text-align: right;">4.6140116</td>
+<td style="text-align: right;">23.70</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">1999</td>
+<td style="text-align: right;">4.9366749</td>
+<td style="text-align: right;">22.52</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2000</td>
+<td style="text-align: right;">3.9124277</td>
+<td style="text-align: right;">19.46</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">2.0383007</td>
+<td style="text-align: right;">17.04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2002</td>
+<td style="text-align: right;">4.0145267</td>
+<td style="text-align: right;">14.95</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2003</td>
+<td style="text-align: right;">3.1103251</td>
+<td style="text-align: right;">13.15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2004</td>
+<td style="text-align: right;">4.2054469</td>
+<td style="text-align: right;">11.89</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2005</td>
+<td style="text-align: right;">3.1603383</td>
+<td style="text-align: right;">10.89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2006</td>
+<td style="text-align: right;">2.7268934</td>
+<td style="text-align: right;">9.97</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">3.7684875</td>
+<td style="text-align: right;">9.68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2008</td>
+<td style="text-align: right;">3.5770149</td>
+<td style="text-align: right;">11.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2009</td>
+<td style="text-align: right;">1.8668321</td>
+<td style="text-align: right;">16.75</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">2.1723371</td>
+<td style="text-align: right;">20.48</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2011</td>
+<td style="text-align: right;">2.4697463</td>
+<td style="text-align: right;">24.20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2012</td>
+<td style="text-align: right;">3.9173625</td>
+<td style="text-align: right;">27.80</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2013</td>
+<td style="text-align: right;">2.6002119</td>
+<td style="text-align: right;">30.83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">2.5629315</td>
+<td style="text-align: right;">34.32</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">2.1722048</td>
+<td style="text-align: right;">37.64</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">2.7416431</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">2.2959269</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">2.8709725</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2019</td>
+<td style="text-align: right;">2.1131494</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2020</td>
+<td style="text-align: right;">-0.0038366</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">2021</td>
+<td style="text-align: right;">1.4751629</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </section>
 
 </main>
