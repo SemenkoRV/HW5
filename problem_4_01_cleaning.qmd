@@ -1,0 +1,143 @@
+---
+title: "Re-evaluating Growth in the Time of Debt"
+subtitle: "[DSLC stages]: Data cleaning and pre-processing"
+format: 
+  html:
+    css: theme.css
+    toc: true
+    toc-location: right
+    number-depth: 4
+    theme: cerulean
+    df-print: kable
+execute:
+  echo: true
+editor: source
+number-sections: true
+embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+
+
+## Domain problem formulation
+The goal is to try and reproduce the findings of Reinhart and Rogoff’s study (introduced in Chapter 3) using historical public debt data as well as gross 
+domestic product (GDP) growth data. 
+
+## Data source overview
+historical public debt data (debt.xls) from the International Monetary Fund (IMF),  
+Gross domestic product (GDP) growth data (growth.csv).
+
+
+## Step 1: Review background information {#sec-bg-info}
+``` {r}
+
+```
+
+### Data dictionary
+``` {r}
+```
+
+## Step 2: Loading in the data
+``` {r}
+#install.packages("readxl")
+#library(readxl)
+library(tidyverse)
+library(dplyr)
+
+#Data first was fixed in Google sheets, and now I am loading corrected data
+growth_original <- read_csv('/Users/romansemenko/Documents/FALL 2025/Practical data analysis/HW5/growth_original.csv')
+head(growth_original)
+debt_original <- read_csv('/Users/romansemenko/Documents/FALL 2025/Practical data analysis/HW5/debt_original.csv')
+
+```
+
+## Step 3: Examine the data and create action items
+"No data" values should be "NA" 
+Data should be converted to long format
+###Debt:
+remove data for "debt" before 1960
+first columns should be renamed to "country"
+convert debt % rate, year from char to numeric
+###Growth 
+remove non-existing countries
+renaming countries that have different name in the debt table
+convert growth % rate, year char to numeric
+### Finding invalid values
+``` {r}
+#Debt
+source('prepare_debt_data.R')
+debt_clean <- prepare_debt_data(debt_original)
+#Growth 
+source("prepare_growth_data.R")
+growth_clean <- prepare_growth_data(growth_original)
+```
+
+### Assessing Column names
+Done above
+
+
+### Assessing variable type
+done before 
+
+### Assessing data completeness
+
+
+``` {r}
+#For the DEBT data
+dim(debt_clean)
+#note it's 194 (countries) times 56 years 
+
+debt_clean |> 
+  # keep only numeric variables
+  select(where(is.numeric)) |> 
+  # for each column, compute a data frame with the min, mean, and max.
+  map_df(function(.col) { data.frame(min = min(.col, na.rm = TRUE),
+                                     mean = mean(.col, na.rm = TRUE),
+                                     max = max(.col, na.rm = TRUE)) },
+         .id = "variable")
+
+
+debt_clean %>%
+  sample_n(10)
+
+
+
+#For the GROWTH data
+dim(growth_clean)
+
+
+growth_clean |> 
+  # keep only numeric variables
+  select(where(is.numeric)) |> 
+  # for each column, compute a data frame with the min, mean, and max.
+  map_df(function(.col) { data.frame(min = min(.col, na.rm = TRUE),
+                                     mean = mean(.col, na.rm = TRUE),
+                                     max = max(.col, na.rm = TRUE)) },
+         .id = "variable")
+
+
+growth_clean %>%
+  sample_n(10)
+```
+
+
+###Comparing Australia as on gradescope
+```{r}
+debt_clean %>% filter(country == 'Australia')
+
+growth_clean %>% filter(country == 'Australia') %>% 
+  select(country, year, growth_as_percent)
+```
+
+
+## Step 4: Clean and pre-process the data
+done in steps before
+Now merging two tables
+```{r}
+source("merge_two_tables.R")
+result <- merge_two_tables(growth_clean,debt_clean)
+
+#Check the result for Australia
+result %>% filter(country == 'Australia') %>%
+  select(country,year,growth_as_percent,debt_as_percent_of_gdp)
+```
